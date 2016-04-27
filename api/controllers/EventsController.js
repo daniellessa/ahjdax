@@ -52,6 +52,25 @@ module.exports = {
 			return res.json(200, {});
 		});
 	},
+
+	getEventsForUser: function(req, res) {
+
+		
+		Events.find({users_id: req.token.id})
+		.populate('users')
+		.populate('services')
+		.populate('professionals')
+		.exec(function(err, events){
+
+			if(err){
+				return res.json(404, {err: err});
+			}
+
+			if(events){
+				return res.json(events);
+			}
+		});
+	},
 	
 };
 

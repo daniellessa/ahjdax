@@ -43,9 +43,10 @@ module.exports.routes = {
   'GET /professionals' : { controller: 'ProfessionalsController', action: 'getUsersProfessionals' },
   'GET /properties' : { controller: 'PropertiesController', action: 'getProperties' },
   'GET /events' : { controller: 'EventsController', action: 'getEvents' },
+  'GET /events_appointments' : { controller: 'EventsController', action: 'getEventsForUser' },
   'POST /events' : { controller: 'EventsController', action: 'saveEvent' },
   'GET /professions' : { controller: 'ProfessionsController', action: 'getProfessions' },
-  'GET /services' : { controller: 'UsersHasServicesController', action: 'getServicesForUserProfessional' },
+  'GET /services' : { controller: 'ServicesController', action: 'getServicesForIdProperty' },
 
 
   /***************************************************************************

@@ -9,8 +9,8 @@ module.exports = {
 
 	getUsersProfessionals: function (req, res) {
 
-		//Professionals.find({property_id: req.query.property_id})
-		Professionals.find()
+		Professionals.find({property_id: req.query.property_id})
+		//Professionals.find()
 		.populate('users')
 		.populate('properties')
 		.populate('professions')
