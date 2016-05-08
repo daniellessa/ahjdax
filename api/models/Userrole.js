@@ -23,6 +23,12 @@ module.exports = {
       model: 'roles',
       via: 'id',
       columnName: 'role_id'
+    },
+
+    property: {
+      model: 'properties',
+      via: 'id',
+      columnName: 'property_id'
     }
   }
 };

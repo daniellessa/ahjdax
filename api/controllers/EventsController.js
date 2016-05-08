@@ -17,7 +17,8 @@ module.exports = {
 		.exec(function(err, events){
 
 			if(err){
-				return res.json(404, {err: err});
+				console.log('Erro #EC001: ', err);
+				return res.json(404, {err: 'Server error #EC001'});
 			}
 
 			if(events){
@@ -30,7 +31,8 @@ module.exports = {
 
 		//validar disponibilidade de horario antes de agendar
 
-		// Events.find().exec(function(err, events){
+		// Events.find({day: req.body.day})
+		// .exec(function(err, events){
 
 		// 	for (var i = 0; i < events.length; i++) {
 				
@@ -46,7 +48,8 @@ module.exports = {
 		Events.create(req.body).exec(function(err,event){
 
 			if(err){
-				return res.json(401, {erro: err});
+				console.log('Erro #EC002: ', err);
+				return res.json(404, {err: 'Server error #EC002'});
 			}
 
 			return res.json(200, {});
@@ -63,7 +66,55 @@ module.exports = {
 		.exec(function(err, events){
 
 			if(err){
-				return res.json(404, {err: err});
+				console.log('Erro #EC003: ', err);
+				return res.json(404, {err: 'Server error #EC003'});
+			}
+
+			if(events){
+				return res.json(events);
+			}
+		});
+	},
+
+	getEventsForUserNotExpired: function(req, res) {
+
+		var currentDate = new Date();
+		
+		Events.find({users_id: req.token.id})
+		.populate('users')
+		.populate('services')
+		.populate('professionals')
+		.where({'startAt': {'>=': currentDate}})
+		.sort('startAt DESC')
+		.exec(function(err, events){
+
+			if(err){
+				console.log('Erro #EC004: ', err);
+				return res.json(404, {err: 'Server error #EC004'});
+			}
+
+			if(events){
+				return res.json(events);
+			}
+		});
+	},
+
+	getEventsForUserExpired: function(req, res) {
+
+		
+		var currentDate = new Date();
+		
+		Events.find({users_id: req.token.id})
+		.populate('users')
+		.populate('services')
+		.populate('professionals')
+		.where({'startAt': {'<': currentDate}})
+		.sort('startAt DESC') 
+		.exec(function(err, events){
+
+			if(err){
+				console.log('Erro #EC005: ', err);
+				return res.json(404, {err: 'Server error #EC005'});
 			}
 
 			if(events){

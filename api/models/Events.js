@@ -8,7 +8,7 @@
 module.exports = {
 
 	autoCreatedAt: true,
-    autoUpdatedAt: true,
+  autoUpdatedAt: true,
 
   attributes: {
 
@@ -26,12 +26,12 @@ module.exports = {
 
   	status: { 
   		type: 'string',
-  		enum: ['pending','serving','finished', 'canceled'] 
+  		enum: ['pending','serving','finished', 'canceled', 'missed'] 
   	},
 
   	finalized: { type: 'boolean' },
 
-  	finalizedAt: { type: 'datetime' },
+  	finalizedAt: { type: 'string' },
 
     professionals: {
       model: 'professionals',

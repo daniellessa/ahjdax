@@ -21,6 +21,8 @@ module.exports = {
 
   	minutes: { type: 'int'},
 
+    old_price: { type: 'float'},
+
   	price: { type: 'float'},
 
   	info: { type: 'string'},

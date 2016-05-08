@@ -37,6 +37,7 @@ module.exports.routes = {
   },
 
   'POST /auth' : { controller: 'AuthController', action: 'auth' },
+  'POST /authGoogleOrFacebook' : { controller: 'AuthController', action: 'authGoogleOrFacebook' },
   'POST /users' : { controller: 'UsersController', action: 'createUser' },
   'GET /users' : { controller: 'UsersController', action: 'getUsers' },
   'POST /update-image' : { controller: 'UsersController', action: 'updateImage' },
@@ -47,6 +48,10 @@ module.exports.routes = {
   'POST /events' : { controller: 'EventsController', action: 'saveEvent' },
   'GET /professions' : { controller: 'ProfessionsController', action: 'getProfessions' },
   'GET /services' : { controller: 'ServicesController', action: 'getServicesForIdProperty' },
+  'GET /events_not_expired' : { controller: 'EventsController', action: 'getEventsForUserNotExpired' },
+  'GET /events_expired' : { controller: 'EventsController', action: 'getEventsForUserExpired' },
+  'POST /new_association' : { controller: 'NotifyController', action: 'newAssociation' },
+  'POST /new_event' : { controller: 'NotifyController', action: 'newEvent' },
 
 
   /***************************************************************************

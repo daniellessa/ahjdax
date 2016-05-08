@@ -15,6 +15,9 @@ module.exports = {
 //Refatorar createUser...
 
 	createUser: function(req, res) {
+
+		console.log("Entrou Create User: ", req.body);
+
 		var roles;
 
 		if ( typeof req.body.roles !== 'undefined' )

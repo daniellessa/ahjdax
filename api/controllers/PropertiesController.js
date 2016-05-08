@@ -10,7 +10,8 @@ module.exports = {
 
 	getProperties: function(req, res) {
 
-		Properties.findOne({pin: req.query.pin}).exec(function(err, property){
+		Properties.find({name : {'contains' : req.query.pin}})
+			.exec(function(err, property){
 
 			if(err){
 				return res.json(404, {err: err});
