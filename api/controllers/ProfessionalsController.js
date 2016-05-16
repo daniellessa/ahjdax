@@ -30,7 +30,7 @@ module.exports = {
 					if(err){
 						return res.json(404, {erro: 'fail in server #PC001'});
 					}
-					console.log("Users: ", allUsers);
+					
 					var finalList = [];
 
 					for (var i = 0; i < allUsers.length; i++) {

@@ -20,7 +20,7 @@ module.exports = {
 
   	bucket_name: { type: 'string' },
 
-  	info: { type: 'string'},
+  	compl: { type: 'string'},
 
   	open_day: { type: 'string'},
 

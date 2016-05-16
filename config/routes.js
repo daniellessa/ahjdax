@@ -52,6 +52,7 @@ module.exports.routes = {
   'GET /events_expired' : { controller: 'EventsController', action: 'getEventsForUserExpired' },
   'POST /new_association' : { controller: 'NotifyController', action: 'newAssociation' },
   'POST /new_event' : { controller: 'NotifyController', action: 'newEvent' },
+  'POST /event_cancel' : { controller: 'NotifyController', action: 'canceledEventByUser' },
 
 
   /***************************************************************************

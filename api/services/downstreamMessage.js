@@ -29,7 +29,21 @@
 	        	'Content-Type':'application/json',
 				'Authorization':'key=AIzaSyAWd9G1zvZ4WBuMe0_LvnSE0hqQyQer9ds'
 	        },
-	        body : "{\"data\":{\"score\":\"5x1\",\"id\":\""+id+"\",\"date\":\""+currentDate+"\",\"time\":\""+hour+"\",\"type\":\""+type+"\",\"title\":\""+title+"\",\"message\":\""+message+"\",\"from_registred_id\":\""+from+"\",\"property_id\":\""+propertyId+"\",},\"registration_ids\":["+targetIds+"]}"
+	        body : "{ \
+	        	\"data\": \
+	        	{ \
+	        		\"score\":\"5x1\", \
+	        		\"id\":\""+id+"\", \
+	        		\"date\":\""+currentDate+"\", \
+	        		\"time\":\""+hour+"\", \
+	        		\"type\":\""+type+"\", \
+	        		\"title\":\""+title+"\", \
+	        		\"message\":\""+message+"\", \
+	        		\"from_registred_id\":\""+from+"\", \
+	        		\"property_id\":\""+propertyId+"\", \
+	        	}, \
+	        	\"registration_ids\":["+targetIds+"] \
+	        }" 
  		};
 
  		//console.log(options.body);

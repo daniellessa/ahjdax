@@ -122,15 +122,72 @@ module.exports = {
 
 	},
 
-	promotionsByUser: function(req, res){
-
-	},
-
 	canceledEventByUser: function(req, res){
+
+		var listIds = [];
+		var date;
+
+		Events.findOne({id: req.body.idServer})
+			.populate('professionals')
+			.populate('users')
+			.exec(function(err, event){
+
+				if(err)
+				{
+					console.log('Error: #SN008', err);
+					return res.json(404, {err: 'Error: #SN008'});
+				}
+
+				date = new Date(event.startAt);
+
+				Users.findOne({id: event.professionals.users})
+					.exec(function(err,professional){
+
+						if(err)
+						{
+							console.log('Error: #SN009', err);
+							return res.json(404, {err: 'Error: #SN009'});
+						}
+
+						listIds.push(professional.registration_id);
+
+						Events.destroy({id: event.id})
+							.exec(function(err, result){
+
+							if(err)
+							{
+								console.log('Error: #SN010', err);
+								return res.json(404, {error: 'Error #SN010'});
+							}
+
+							var type = 3; //mudar
+							var title = 'Cancelamento';
+							var message = "O usuário "+event.users.name+" acaba de cancelar seu agendamento de "+ format.dateFull(date);
+
+							downstreamMessage.send(type,event.users.registration_id, listIds,title,message,null,function(err, response){
+
+								if (err) 
+								{
+									console.log('Error: #SN003', err);
+									return res.json(404, {error: 'Error #SN011'});
+								}
+
+								return res.json(response);
+							});
+
+						});
+
+				});
+
+		});
 
 	},
 
 	canceledEventByProfessional: function(req, res){
+
+	},
+
+	promotionsByUser: function(req, res){
 
 	},
 
