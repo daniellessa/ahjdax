@@ -53,6 +53,8 @@ module.exports.routes = {
   'POST /new_association' : { controller: 'NotifyController', action: 'newAssociation' },
   'POST /new_event' : { controller: 'NotifyController', action: 'newEvent' },
   'POST /event_cancel' : { controller: 'NotifyController', action: 'canceledEventByUser' },
+  'GET /professional_for_id' : { controller: 'ProfessionalsController', action: 'getProfessionalForId' },
+
 
 
   /***************************************************************************

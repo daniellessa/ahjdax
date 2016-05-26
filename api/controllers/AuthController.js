@@ -5,65 +5,215 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 var bcrypt = require('bcryptjs');
+var async = require('async');
 
 module.exports = {
 
 	auth: function(req, res) {
+
+		console.log('BODY: ', req.body);
 		var email = req.body.email;
 		var password = req.body.password;
-
-		console.log("Login: ", email +" - "+ password);
+		var device_token = req.body.registration_id;
+		var findedUser;
 
 		if ( !email || !password )
 		{
 			return res.json(401, {err: 'email and password required'});
 		}
 
-		Users.findOne({ email: email, })
-			.populate('roles')
-			.exec(function(err, user) {
+		async.waterfall([
 
+			function checkUserExistence(step) {
 
-			if (!user)
-				return res.json(401, {err: 'invalid email or password'});
+				Users.findOne({email: email})
+					.populate('roles')
+					.exec(function(err, user){
 
+						if(err)
+						{
+							err.status = 401;
+							return step(err);
+						}
 
-			Users.comparePassword(password, user, function(err, valid) {
+						if(!user)
+						{
+							err = {};
+							err.status = 401;
+							return step(err);
+						}
 
-				if (err)
-					return res.json(403, {err: 'forbidden'});
-				
+						step(null, user);
+					});
+			},
+			function validadeCredentials(user, step) {
 
-				if (!valid)
-					return res.json(401, {err: 'invalid email or password'});
-				
-				
-				return res.json({
-					user: user,
-					token: jwToken.issue({
-					id: user.id, 
-					registration_id: user.registration_id, 
-					email: user.email, 
-					name: user.name, 
-					sex: user.sex, 
-					photo_path: user.photo_path,
-					bucket_name: user.bucket_name						
-					})
+				Users.comparePassword(password, user, function(err, valid){
+
+					if(err)
+					{
+						err.status = 403;
+						return step(err);
+					}
+
+					if (!valid)
+					{
+						err = {};
+						err.status = 401;
+						return step(err);
+					}
+
+					step(null,user);
+
 				});
-			});				
+			},
+
+			function updateDeviceToken(user, step) {
+
+				if(!device_token && device_token !== 'undefined')
+				{
+					console.log('registration_id: ', device_token);
+					Users.compareAndUpdateDeviceToken(device_token, user);
+				}
+
+				step(null, user);
+			},
+
+			function hideSensitiveUserInfos(user,step) {
+				delete user.password;
+				delete user.registration_id;
+
+				step(null, user);
+			},
+
+			function buildToken(user,step) {
+				var token = jwToken.issue(user);
+				findedUser = user;
+				step(null,token);
+			}
+
+		], function result(err,token) {
+			if (err)
+				return res.negotiate(err);
+
+			return res.json({
+				user: findedUser,
+				token: token
+			});
 		});
+
 	},
 
 	authGoogleOrFacebook: function(req, res) {
+
 		var email = req.body.email;
-		var password = req.body.password;
+		var device_token = req.body.registration_id;
+		var findedUser;
+		var roles;
 
-		console.log("Login: ", email +" - "+ password);
-
-		if ( !email || !password )
+		if ( typeof req.body.roles !== 'undefined' )
 		{
-			return res.json(401, {err: 'email and password required'});
+			roles = req.body.roles;
+			delete req.body.roles;
 		}
+
+		if (!email)
+		{
+			return res.json(401, {err: 'email required'});
+		}
+
+		async.waterfall([
+
+			function checkUserExistenceOrCreate(step) {
+
+				Users.findOne({email: email, })
+					.populate('roles')
+					.exec(function(err, user){
+
+						if(err)
+						{
+							err.status = 401;
+							return step(err);
+						}
+
+						if(!user)
+						{
+							Users.create(req.body).exec(function(err, newUser){
+
+								if(err)
+								{
+									err.status = 401;
+									return step(err);
+								}
+
+								var entries = [];
+								//workaround for inserting into users_has_roles table
+								for (var r in roles)
+								{
+									var entry = {};
+									entry.user_id = user.id;
+									entry.role_id = roles[r];
+									entries.push(entry);
+								}
+
+								console.log('entry',entry);
+
+								Userrole.create(entries).exec(function(err, Userrole) {
+
+									if(err)
+									{
+										err.status = 401;
+										return step(err);
+									}
+
+									step(null, newUser);
+								});
+
+							});
+						}
+
+						step(null, user);
+				});
+			},
+
+			function updateDeviceToken(user, step) {
+
+				if(!device_token && device_token !== 'undefined')
+				{
+					console.log('registration_id: ', device_token);
+					Users.compareAndUpdateDeviceToken(device_token, user);
+				}
+
+				step(null, user);
+			},
+
+			function hideSensitiveUserInfos(user,step) {
+				delete user.password;
+				delete user.registration_id;
+
+				step(null, user);
+			},
+
+			function buildToken(user,step) {
+				var token = jwToken.issue(user);
+				findedUser = user;
+				step(null,token);
+			}
+
+
+
+		], function result(err,token) {
+			if (err)
+				return res.negotiate(err);
+
+			return res.json({
+				user: findedUser,
+				token: token
+			});
+		});
+
+
+
 
 		Users.findOne({email: email, })
 			.populate('roles')

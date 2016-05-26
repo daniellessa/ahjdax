@@ -4,8 +4,31 @@
  * @description :: Server-side logic for managing Professionals
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
+ var async = require('async');
+
 
 module.exports = {
+
+	getProfessionalForId: function (req, res) {
+
+		console.log('Professional');
+
+		Professionals.findOne({users: req.query.user_id})
+			.populate('users')
+			.populate('properties')
+			.populate('professions')
+			.exec(function (err, prof){
+
+				if(err)
+				{
+					err.status = 401;
+                    return step(err);
+				}
+				console.log('Professional: ', prof);
+				return res.json(prof);
+			});
+			
+	},
 
 	getUsersProfessionals: function (req, res) {
 

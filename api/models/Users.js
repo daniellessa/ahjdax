@@ -50,15 +50,6 @@ module.exports = {
           through: 'usershasservices'
         },
 
-    
-
-
-    toJSON: function() {
-        	var obj = this.toObject();
-        	delete obj.password;
-        	return obj;
-        }
-
   },
 
 
@@ -92,6 +83,52 @@ module.exports = {
         });
     },
 
+    compareAndUpdateDeviceToken: function(device_token, user) {
+
+            async.waterfall([
+
+                function findUser(step){
+
+                    Users.findOne({id: user.id}).exec(function(err, findedUser){
+                        if(err)
+                        {
+                            err.status = 401;
+                            return step(err);
+                        }
+
+                        step(null, user);
+                    });
+                },
+
+                function updateUser(user, step){
+
+                    if(user.registration_id !== device_token)
+                    {
+                        Users.update({id: user.id},{registration_id: device_token, photo_path: user.photo_path})
+                            .exec(function(err, result){
+
+                                if(err)
+                                {
+                                    err.status = 401;
+                                    return step(err);
+                                }
+
+                            });
+                    }
+
+                    step(null, user)
+                }
+
+
+            ], function result(err,token) {
+            if (err)
+                return res.negotiate(err);
+
+            console.log("Passou aqui #U001");
+        });
+
+    },
+
     checkIfAdmin: function(user_id, cb) {
         Userrole.find({user_id: user_id}).populate('roles').exec(function(err, found) {
 
@@ -102,30 +139,30 @@ module.exports = {
         Userrole.find({user_id: user_id}).exec(function(err, found) {
 
             var response = {
-                nurse: false,
-                physician: false,
+                admin_master: false,
                 admin: false,
-                teamAdmin: false
+                professional: false,
+                user: false
             };
 
             _(found).forEach(function(role) {
                 console.log(role);
                 switch (role.role)
                 {
+                    case Roles.constants.ADMIN_MASTER:
+                        response.admin_master = true;
+                        break;
+
                     case Roles.constants.ADMIN:
                         response.admin = true;
                         break;
 
-                    case Roles.constants.PHYSICIAN:
-                        response.physician = true;
+                    case Roles.constants.PROFESSIONAL:
+                        response.professional = true;
                         break;
 
-                    case Roles.constants.NURSE:
-                        response.nurse = true;
-                        break;
-
-                    case Roles.constants.TEAM_ADMIN:
-                        response.teamAdmin = true;
+                    case Roles.constants.USER:
+                        response.user = true;
                         break;
                 }
             }).value();
