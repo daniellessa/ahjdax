@@ -27,10 +27,26 @@ module.exports.policies = {
   ***************************************************************************/
 
   'AuthController': {
-    '*': true
+    'authProfessional' : true,
+    'authUser' : true,
   },
 
-  '*': ['isAuthorized'],
+  'ProfessionalsController' : {
+    'createProfessional': true,
+    'getProfessionalsByProperty' : ['isAuthenticated']
+  },
+
+  'EventController' : {
+    '*' : ['isAuthenticated']
+  },
+
+  'PropertyController' : {
+    '*' : ['isAuthenticated']
+  },
+
+  'UserController' : {
+    '*' : ['isAuthenticated']
+  },
 
   // '*': true,
 

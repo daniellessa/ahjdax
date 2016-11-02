@@ -9,13 +9,9 @@ var async = require('async');
 
 module.exports = {
 
-	auth: function(req, res) {
-
-		console.log('BODY: ', req.body);
+	authProfessional: function(req, res) {
 		var email = req.body.email;
 		var password = req.body.password;
-		var device_token = req.body.registration_id;
-		var findedUser;
 
 		if ( !email || !password )
 		{
@@ -24,31 +20,35 @@ module.exports = {
 
 		async.waterfall([
 
-			function checkUserExistence(step) {
+			function checkProfessionalExistence(step) {
+				Professional
+					.findOne({email: email})
+					.populate('user')
+					.populate('profession')
+					.populate('properties')
+					.exec(function(err, professional){
 
-				Users.findOne({email: email})
-					.populate('roles')
-					.exec(function(err, user){
-
-						if(err)
-						{
-							err.status = 401;
-							return step(err);
-						}
-
-						if(!user)
-						{
-							err = {};
-							err.status = 401;
-							return step(err);
-						}
-
-						step(null, user);
-					});
+					if(err)
+					{
+						err.status = 401;
+						return step(err);
+					}
+					if(!professional)
+					{
+						err = {};
+						err.status = 401;
+						return step(err);
+					}
+					step(null, professional);
+				});
 			},
-			function validadeCredentials(user, step) {
-
-				Users.comparePassword(password, user, function(err, valid){
+			function addImagesSigned (professional, step) {
+				professional.user.url = Image.getSignedURL(professional.user.photoPath);
+				step(null, professional);
+			},
+			function validadeCredentials(professional, step) {
+				Professional
+					.comparePassword(password, professional, function(err, valid){
 
 					if(err)
 					{
@@ -63,44 +63,44 @@ module.exports = {
 						return step(err);
 					}
 
-					step(null,user);
+					step(null,professional);
 
 				});
 			},
-
-			function updateDeviceToken(user, step) {
-
-				if(!device_token && device_token !== 'undefined')
-				{
-					console.log('registration_id: ', device_token);
-					Users.compareAndUpdateDeviceToken(device_token, user);
-				}
-
-				step(null, user);
+			function populateRoles(professional, step) {
+				User.findOne({id: professional.user.id})
+					.populate('roles')
+					.exec(function(err, user){
+					if(err)
+					{
+						err.status = 403;
+						return step(err);
+					}
+					professional.user.roles = user.roles;
+					step(null, professional);
+				});
 			},
-
-			function hideSensitiveUserInfos(user,step) {
-				delete user.password;
-				delete user.registration_id;
-
-				step(null, user);
+			function hideSensitiveUserInfos(professional,step) {
+				delete professional.password;
+				delete professional.user.deviceToken;
+				step(null, professional);
 			},
-
-			function buildToken(user,step) {
-				var token = jwToken.issue(user);
-				findedUser = user;
-				step(null,token);
+			function buildToken(professional,step) {
+				var token = jwToken.issue(professional);
+				step(null,token,professional);
 			}
-
-		], function result(err,token) {
+		], function result(err,token, professional) {
 			if (err)
 				return res.negotiate(err);
 
 			return res.json({
-				user: findedUser,
+				professional: professional,
 				token: token
 			});
 		});
+	},
+
+	authUser: function(req, res) {
 
 	},
 

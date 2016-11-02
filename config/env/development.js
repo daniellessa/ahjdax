@@ -27,7 +27,7 @@ module.exports = {
 			host: 'localhost',
 			user: 'homestead',
 			password: 'secret',
-			database: 'agenda_mobile',
+			database: 'salao7',
 			port: 33060
 		}
 	}

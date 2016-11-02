@@ -27,7 +27,7 @@ module.exports = {
       adapter: 'sails-mysql',
         host: 'aa1mlosluk9il55.cbjoerfyrpgh.us-east-1.rds.amazonaws.com',
         user: 'daniellessa',
-        password: '30abril87',
+        password: 'secret',
         database: 'ebdb',
       port: 3306
     }

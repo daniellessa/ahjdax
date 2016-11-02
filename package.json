@@ -6,6 +6,7 @@
   "keywords": [],
   "dependencies": {
     "async": "^1.5.2",
+    "aws-sdk": "^2.4.4",
     "bcryptjs": "^2.3.0",
     "ejs": "2.3.4",
     "grunt": "0.4.5",
